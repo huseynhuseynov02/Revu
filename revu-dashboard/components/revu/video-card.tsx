@@ -397,55 +397,40 @@ export function VideoCard({
                   </div>
 
                   <form onSubmit={handleBooking} className="flex flex-col gap-4">
-                    <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-300 uppercase tracking-[0.22em] ml-1">Date</label>
-                      <div className="relative group">
-                        <CalendarIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-cyan-300 transition-colors pointer-events-none z-10" />
-                        <input 
-                          type="date" 
-                          name="date"
-                          required
-                          className="w-full rounded-2xl border border-white/10 bg-white/5 px-12 py-3.5 text-white outline-none transition-all placeholder:text-slate-500 focus:border-cyan-300/60 focus:bg-white/[0.08] focus:ring-2 focus:ring-cyan-300/20"
-                          style={{ colorScheme: 'dark' }}
-                        />
-                      </div>
-                    </div>
+                    <BookingField label="Date" icon={CalendarDays}>
+                      <input
+                        type="date"
+                        name="date"
+                        required
+                        className="booking-input min-w-0 flex-1 bg-transparent text-white outline-none"
+                        style={{ colorScheme: "dark" }}
+                      />
+                    </BookingField>
 
-                    <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-300 uppercase tracking-[0.22em] ml-1">Time</label>
-                      <div className="relative group">
-                        <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-cyan-300 transition-colors pointer-events-none z-10" />
-                        <input 
-                          type="time" 
-                          name="time"
-                          required
-                          className="w-full rounded-2xl border border-white/10 bg-white/5 px-12 py-3.5 text-white outline-none transition-all placeholder:text-slate-500 focus:border-cyan-300/60 focus:bg-white/[0.08] focus:ring-2 focus:ring-cyan-300/20"
-                          style={{ colorScheme: 'dark' }}
-                        />
-                      </div>
-                    </div>
+                    <BookingField label="Time" icon={Clock}>
+                      <input
+                        type="time"
+                        name="time"
+                        required
+                        className="booking-input min-w-0 flex-1 bg-transparent text-white outline-none"
+                        style={{ colorScheme: "dark" }}
+                      />
+                    </BookingField>
 
-                    <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-300 uppercase tracking-[0.22em] ml-1">Guests</label>
-                      <div className="relative group">
-                        <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-cyan-300 transition-colors pointer-events-none z-10" />
-                        <select 
-                          name="guests"
-                          required
-                          className="w-full appearance-none rounded-2xl border border-white/10 bg-white/5 px-12 py-3.5 text-white outline-none transition-all focus:border-cyan-300/60 focus:bg-white/[0.08] focus:ring-2 focus:ring-cyan-300/20 cursor-pointer"
-                        >
-                          <option value="1" className="bg-slate-950">1 Guest</option>
-                          <option value="2" className="bg-slate-950">2 Guests</option>
-                          <option value="3" className="bg-slate-950">3 Guests</option>
-                          <option value="4" className="bg-slate-950">4 Guests</option>
-                          <option value="5" className="bg-slate-950">5 Guests</option>
-                          <option value="6" className="bg-slate-950">6+ Guests</option>
-                        </select>
-                        <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"/></svg>
-                        </div>
-                      </div>
-                    </div>
+                    <BookingField label="Guests" icon={Users}>
+                      <select
+                        name="guests"
+                        required
+                        className="booking-input min-w-0 flex-1 appearance-none bg-transparent text-white outline-none cursor-pointer"
+                      >
+                        <option value="1" className="bg-slate-950">1 Guest</option>
+                        <option value="2" className="bg-slate-950">2 Guests</option>
+                        <option value="3" className="bg-slate-950">3 Guests</option>
+                        <option value="4" className="bg-slate-950">4 Guests</option>
+                        <option value="5" className="bg-slate-950">5 Guests</option>
+                        <option value="6" className="bg-slate-950">6+ Guests</option>
+                      </select>
+                    </BookingField>
 
                     <button
                       type="submit"
@@ -469,6 +454,28 @@ export function VideoCard({
           document.body
         )}
     </>
+  )
+}
+
+function BookingField({
+  label,
+  icon: Icon,
+  children,
+}: {
+  label: string
+  icon: React.ElementType
+  children: React.ReactNode
+}) {
+  return (
+    <div className="space-y-2">
+      <label className="text-xs font-semibold text-slate-300 uppercase tracking-[0.22em] ml-1">
+        {label}
+      </label>
+      <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 transition-all focus-within:border-cyan-300/60 focus-within:bg-white/[0.08] focus-within:ring-2 focus-within:ring-cyan-300/20">
+        <Icon className="h-5 w-5 shrink-0 text-slate-400" aria-hidden />
+        {children}
+      </div>
+    </div>
   )
 }
 

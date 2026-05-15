@@ -34,11 +34,17 @@
   --card-padding: 18px; /* inner card padding */
 }
 
-/* Hide default browser icons for cleaner custom UI */
-input[type="date"]::-webkit-calendar-picker-indicator,
-input[type="time"]::-webkit-calendar-picker-indicator {
-  opacity: 0;
+/* Booking modal: native pickers align with flex field layout */
+.booking-input {
+  font: inherit;
+  line-height: 1.25;
+}
+
+.booking-input::-webkit-calendar-picker-indicator,
+.booking-input::-webkit-time-picker-indicator {
   cursor: pointer;
+  filter: invert(0.85);
+  margin-left: 4px;
 }
 
 @theme inline {
