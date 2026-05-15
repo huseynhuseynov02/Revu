@@ -5,7 +5,8 @@ import { cn } from "@/lib/utils"
 import { formatCount } from "@/lib/mockData"
 import { useApp } from "@/lib/AppContext"
 import { motion, AnimatePresence } from "framer-motion"
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
+import { createPortal } from "react-dom"
 
 interface VideoCardProps {
   id: string
@@ -60,6 +61,20 @@ export function VideoCard({
   const [showHeartBurst, setShowHeartBurst] = useState(false)
   const [isBookingOpen, setIsBookingOpen] = useState(false)
   const [bookingStatus, setBookingStatus] = useState<"idle" | "loading" | "success">("idle")
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isBookingOpen) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [isBookingOpen])
 
   const handleDoubleTap = useCallback(() => {
     if (!isLiked) {
@@ -230,8 +245,9 @@ export function VideoCard({
           </motion.button>
         </div>
 
-        {/* Bottom Content */}
-        <div className="absolute inset-x-0 bottom-0 p-5 pb-24 z-10">
+        {/* Bottom Content + CTA */}
+        <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col max-h-[72%]">
+          <div className="overflow-y-auto min-h-0 p-5 pb-3">
           {/* UGC Info: Uploader and Caption */}
           {uploader && (
             <div className="mb-4">
@@ -275,7 +291,7 @@ export function VideoCard({
           </h3>
 
           {/* Rating with Trust Badge */}
-          <div className="flex items-center gap-3 mb-4 flex-wrap">
+          <div className="flex items-center gap-3 flex-wrap">
             <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
               <div className="relative">
                 <Star className="w-4 h-4 text-[#F59E0B] fill-[#F59E0B]" />
@@ -302,36 +318,48 @@ export function VideoCard({
               <span className="text-[11px] font-semibold uppercase tracking-[0.18em]">{eventDateTime}</span>
             </div>
           )}
-        </div>
+          </div>
 
-        {/* Book Button */}
-        <motion.button
-          className="absolute bottom-4 left-4 right-4 z-20 bg-[#3B82F6] text-white font-semibold py-3.5 rounded-2xl transition-all duration-300 shadow-[0_8px_28px_rgba(59,130,246,0.42)] hover:shadow-[0_10px_32px_rgba(59,130,246,0.26)] hover:bg-[#2563EB] flex items-center justify-center gap-2 border border-white/10"
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => setIsBookingOpen(true)}
-        >
-          <CalendarIcon className="w-5 h-5" />
-          Book a Table
-        </motion.button>
+          <div className="px-4 pb-4 pt-1 flex-shrink-0">
+            <motion.button
+              type="button"
+              className="w-full bg-[#3B82F6] text-white font-semibold py-3.5 rounded-2xl transition-all duration-300 shadow-[0_8px_28px_rgba(59,130,246,0.42)] hover:shadow-[0_10px_32px_rgba(59,130,246,0.26)] hover:bg-[#2563EB] flex items-center justify-center gap-2 border border-white/10"
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setIsBookingOpen(true)}
+            >
+              <CalendarIcon className="w-5 h-5" />
+              Book a Table
+            </motion.button>
+          </div>
+        </div>
       </div>
 
-      {/* Booking Modal Overlay */}
-      <AnimatePresence>
-        {isBookingOpen && (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <div className="absolute inset-0 bg-slate-950/75 backdrop-blur-xl" onClick={() => setIsBookingOpen(false)} />
-            <motion.div
-              className="relative w-full max-w-[560px] overflow-hidden rounded-[32px] border border-white/10 bg-slate-900/80 shadow-[0_40px_120px_rgba(0,0,0,0.7)] backdrop-blur-xl"
-              initial={{ scale: 0.92, y: 24 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.92, y: 24 }}
-            >
+      {/* Booking Modal — portaled so fixed positioning isn't trapped by card transforms */}
+      {isMounted &&
+        createPortal(
+          <AnimatePresence>
+            {isBookingOpen && (
+              <motion.div
+                className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="booking-modal-title"
+              >
+                <div
+                  className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl"
+                  onClick={() => setIsBookingOpen(false)}
+                />
+                <motion.div
+                  className="relative z-10 flex w-full max-w-md max-h-[min(640px,calc(100vh-2rem))] flex-col overflow-hidden rounded-[28px] border border-white/10 bg-slate-900 shadow-[0_40px_120px_rgba(0,0,0,0.7)]"
+                  initial={{ scale: 0.95, y: 16 }}
+                  animate={{ scale: 1, y: 0 }}
+                  exit={{ scale: 0.95, y: 16 }}
+                  onClick={(e) => e.stopPropagation()}
+                >
               <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-emerald-400" />
               <button 
                 className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/10 transition-colors text-slate-400 hover:text-white z-10"
@@ -340,8 +368,9 @@ export function VideoCard({
                 <X className="w-5 h-5" />
               </button>
 
+              <div className="overflow-y-auto overscroll-contain">
               {bookingStatus === "success" ? (
-                <div className="px-6 py-12 md:px-8 flex flex-col items-center text-center space-y-4">
+                <div className="px-6 py-12 flex flex-col items-center text-center space-y-4">
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
@@ -355,20 +384,20 @@ export function VideoCard({
                   <p className="text-slate-400">Your table at {title} is booked successfully.</p>
                 </div>
               ) : (
-                <div className="px-6 py-6 md:px-8 md:py-8">
-                  <div className="mb-6">
+                <div className="px-6 py-6">
+                  <div className="mb-6 pr-8">
                     <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-cyan-100 mb-4">
                       <CalendarDays className="w-3.5 h-3.5" />
                       Premium reservation
                     </div>
-                    <h3 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: "var(--font-display)" }}>
+                    <h3 id="booking-modal-title" className="text-2xl font-bold text-white mb-2" style={{ fontFamily: "var(--font-display)" }}>
                       Book a Table
                     </h3>
                     <p className="text-slate-400 text-sm">at {title}</p>
                   </div>
 
-                  <form onSubmit={handleBooking} className="grid gap-4 md:grid-cols-3">
-                    <div className="space-y-2 md:col-span-1">
+                  <form onSubmit={handleBooking} className="flex flex-col gap-4">
+                    <div className="space-y-2">
                       <label className="text-xs font-semibold text-slate-300 uppercase tracking-[0.22em] ml-1">Date</label>
                       <div className="relative group">
                         <CalendarIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-cyan-300 transition-colors pointer-events-none z-10" />
@@ -382,7 +411,7 @@ export function VideoCard({
                       </div>
                     </div>
 
-                    <div className="space-y-2 md:col-span-1">
+                    <div className="space-y-2">
                       <label className="text-xs font-semibold text-slate-300 uppercase tracking-[0.22em] ml-1">Time</label>
                       <div className="relative group">
                         <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-cyan-300 transition-colors pointer-events-none z-10" />
@@ -396,7 +425,7 @@ export function VideoCard({
                       </div>
                     </div>
 
-                    <div className="space-y-2 md:col-span-1">
+                    <div className="space-y-2">
                       <label className="text-xs font-semibold text-slate-300 uppercase tracking-[0.22em] ml-1">Guests</label>
                       <div className="relative group">
                         <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-cyan-300 transition-colors pointer-events-none z-10" />
@@ -421,7 +450,7 @@ export function VideoCard({
                     <button
                       type="submit"
                       disabled={bookingStatus === "loading"}
-                      className="md:col-span-3 mt-2 w-full rounded-2xl bg-gradient-to-r from-[#3B82F6] to-[#10B981] px-5 py-3.5 font-semibold text-white shadow-[0_12px_30px_rgba(16,185,129,0.18)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center gap-2"
+                      className="mt-2 w-full rounded-2xl bg-gradient-to-r from-[#3B82F6] to-[#10B981] px-5 py-3.5 font-semibold text-white shadow-[0_12px_30px_rgba(16,185,129,0.18)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center gap-2"
                     >
                       {bookingStatus === "loading" ? (
                         <div className="w-5 h-5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
@@ -432,10 +461,13 @@ export function VideoCard({
                   </form>
                 </div>
               )}
-            </motion.div>
-          </motion.div>
+              </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body
         )}
-      </AnimatePresence>
     </>
   )
 }

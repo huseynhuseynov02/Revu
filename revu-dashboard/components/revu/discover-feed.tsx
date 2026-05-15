@@ -4,7 +4,6 @@ import { VideoCard } from "./video-card"
 import { useApp } from "@/lib/AppContext"
 import { useEffect, useRef, useCallback } from "react"
 import { motion } from "framer-motion"
-import { cn } from "@/lib/utils"
 
 export function DiscoverFeed() {
   const { places, setActivePlaceIndex, toggleLike, toggleBookmark, feedScrollRef } = useApp()
@@ -50,7 +49,7 @@ export function DiscoverFeed() {
     <div className="flex-1 flex flex-col min-w-0 h-full w-full relative bg-transparent overflow-hidden">
       {/* Header */}
       <div className="px-6 pt-8 pb-5 flex-shrink-0 w-full relative z-10">
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
           <div className="text-center">
             <motion.h1
               className="text-4xl font-black text-white mb-2 tracking-tight"
@@ -69,27 +68,6 @@ export function DiscoverFeed() {
             >
               Swipe through the best spots in town
             </motion.p>
-          </div>
-
-          <div className="flex items-center justify-center gap-2 w-fit mx-auto">
-            {["For You", "Following", "Trending"].map((tab, i) => (
-              <motion.button
-                key={tab}
-                className={cn(
-                  "px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 border border-transparent",
-                  i === 0
-                    ? "bg-white/10 text-white border-white/10"
-                    : "text-zinc-400 hover:text-white hover:bg-white/5"
-                )}
-                whileHover={{ scale: i !== 0 ? 1.05 : 1.02 }}
-                whileTap={{ scale: 0.95 }}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * i }}
-              >
-                {tab}
-              </motion.button>
-            ))}
           </div>
         </div>
       </div>

@@ -13,7 +13,7 @@
     "orientationAngle": 0,
     "orientationType": "landscape-primary"
   },
-  "timestamp": "2026-05-15T16:34:29.011Z",
+  "timestamp": "2026-05-15T16:58:12.814Z",
   "url": "http://localhost:3000/",
   "toolOptions": {
     "runOnly": {
@@ -679,7 +679,7 @@
           "all": [],
           "none": [],
           "impact": null,
-          "html": "<div class=\"min-h-screen bg-black flex items-center justify-center overflow-hidden\" style=\"opacity: 1;\">",
+          "html": "<div class=\"min-h-screen h-screen bg-black flex items-center justify-center overflow-hidden\" style=\"opacity: 1;\">",
           "target": [
             ".min-h-screen"
           ]
