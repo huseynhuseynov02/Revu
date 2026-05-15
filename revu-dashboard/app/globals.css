@@ -1,0 +1,272 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* ─── Theme tokens ─── */
+:root {
+  --bg-primary: #0F172A;
+  --bg-secondary: #1E293B;
+  --bg-elevated: #334155;
+  --accent: #3B82F6;
+  --accent-hover: #2563EB;
+  --accent-glow: rgba(59, 130, 246, 0.35);
+  --accent-glow-strong: rgba(59, 130, 246, 0.6);
+  --surface-glass: rgba(255, 255, 255, 0.05);
+  --border-glass: rgba(255, 255, 255, 0.1);
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --danger: #F43F5E;
+  --warning: #F59E0B;
+  --success: #10B981;
+  --font-display: var(--font-jakarta), 'Plus Jakarta Sans', sans-serif;
+  --font-body: var(--font-jakarta), 'Plus Jakarta Sans', sans-serif;
+
+  /* Spacing system (atomic scale) */
+  --space-1: 6px; /* xs */
+  --space-2: 8px; /* sm */
+  --space-3: 12px; /* md */
+  --space-4: 16px; /* lg */
+  --space-5: 24px; /* xl */
+  --space-6: 32px; /* xxl */
+  --space-7: 40px; /* hero */
+
+  --container-padding: 28px; /* safe area padding */
+  --card-padding: 18px; /* inner card padding */
+}
+
+/* Hide default browser icons for cleaner custom UI */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  cursor: pointer;
+}
+
+@theme inline {
+  --color-background: var(--bg-primary);
+  --color-foreground: var(--text-primary);
+}
+
+/* ─── Base ─── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+/* ─── Layout helpers (use to enforce breathing room) ─── */
+.safe-area {
+  padding-left: var(--container-padding);
+  padding-right: var(--container-padding);
+}
+
+.u-container {
+  padding: var(--container-padding);
+}
+
+.card-pad {
+  padding: var(--card-padding);
+}
+
+.col-gap-lg {
+  gap: var(--space-6) !important;
+}
+
+.card-margin-lg {
+  margin-bottom: var(--space-5);
+}
+
+.center-viewport {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ─── Glassmorphism ─── */
+.glass {
+  background: var(--surface-glass);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--border-glass);
+}
+
+.glass-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.01) 100%
+  );
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--border-glass);
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ─── Neon Glows ─── */
+.neon-glow {
+  box-shadow: 
+    0 0 15px var(--accent-glow),
+    0 0 40px rgba(0, 87, 255, 0.15),
+    inset 0 0 15px rgba(0, 87, 255, 0.05);
+}
+
+.neon-glow-sm {
+  box-shadow: 
+    0 0 8px var(--accent-glow),
+    0 0 20px rgba(0, 87, 255, 0.1);
+}
+
+.neon-text {
+  text-shadow: 0 0 12px var(--accent-glow);
+}
+
+/* ─── Gradient Overlay (for video cards) ─── */
+.gradient-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(9, 9, 11, 0.1) 0%,
+    rgba(9, 9, 11, 0.05) 30%,
+    rgba(9, 9, 11, 0.4) 60%,
+    rgba(9, 9, 11, 0.92) 100%
+  );
+}
+
+/* ─── Animations ─── */
+@keyframes pulse-live {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.8);
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 8px var(--accent-glow), 0 0 20px rgba(0, 87, 255, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 16px var(--accent-glow-strong), 0 0 40px rgba(0, 87, 255, 0.2);
+  }
+}
+
+@keyframes ping-slow {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-pulse-live {
+  animation: pulse-live 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 87, 255, 0.15) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2.5s linear infinite;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.animate-ping-slow {
+  animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out forwards;
+}
+
+/* ─── Snap Scroll ─── */
+.snap-container {
+  scroll-snap-type: y mandatory;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.snap-card {
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}
+
+/* ─── Headings ─── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+}
+
+/* ─── Selection ─── */
+::selection {
+  background: var(--accent);
+  color: white;
+}
