@@ -55,20 +55,20 @@ export function LiveMapView() {
                   <span className="absolute h-6 w-6 rounded-full bg-[#3B82F6]/40 animate-ping-slow" />
                 </>
               ) : (
-                <span className="absolute h-9 w-9 rounded-full bg-white/10 blur-sm" />
+                <span className="absolute h-9 w-9 rounded-full bg-white/15 blur-sm" />
               )}
               <div
                 className={cn(
                   "relative flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-transform duration-200",
                   isUnlocked
                     ? "border-[#93C5FD]/40 bg-[#1D4ED8]/50 text-white shadow-[0_0_24px_rgba(59,130,246,0.45)]"
-                    : "border-white/35 bg-white/20 text-white/90 shadow-[0_0_16px_rgba(255,255,255,0.12)]"
+                    : "border-white/25 bg-zinc-600/55 text-zinc-100 shadow-[0_0_14px_rgba(0,0,0,0.22)]"
                 )}
               >
                 {isUnlocked ? (
                   <MapPin className="h-5 w-5 text-[#93C5FD]" />
                 ) : (
-                  <Lock className="h-4 w-4 text-white/85" />
+                  <Lock className="h-4 w-4 text-white/80" />
                 )}
               </div>
             </div>
@@ -93,14 +93,14 @@ export function LiveMapView() {
                       </div>
                     </div>
                     {!isUnlocked && (
-                      <span className="flex-shrink-0 rounded-full border border-white/15 bg-white/10 p-1">
-                        <Lock className="h-3 w-3 text-white/80" />
+                      <span className="flex-shrink-0 rounded-full border border-white/20 bg-zinc-600/50 p-1">
+                        <Lock className="h-3 w-3 text-white/75" />
                       </span>
                     )}
                   </div>
                   <div className="mt-2 flex items-center justify-between gap-3">
                     <div className="text-[11px] text-slate-400 flex items-center gap-1.5">
-                      <CalendarDays className={cn("h-3.5 w-3.5", isUnlocked ? "text-[#3B82F6]" : "text-white/50")} />
+                      <CalendarDays className={cn("h-3.5 w-3.5", isUnlocked ? "text-[#3B82F6]" : "text-zinc-400")} />
                       {isUnlocked ? place.liveStatus : "Visit to unlock"}
                     </div>
                     {isUnlocked ? (
@@ -112,7 +112,7 @@ export function LiveMapView() {
                         Book
                       </button>
                     ) : (
-                      <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[11px] font-semibold text-white/70">
+                      <span className="rounded-full border border-white/20 bg-zinc-600/50 px-3 py-1.5 text-[11px] font-semibold text-zinc-200">
                         Locked
                       </span>
                     )}
