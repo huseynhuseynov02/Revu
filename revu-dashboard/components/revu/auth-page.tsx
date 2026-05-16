@@ -1,11 +1,11 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { useApp } from "@/lib/AppContext"
+import { useAppActions } from "@/lib/AppContext"
 import { User, Building2, ArrowRight } from "lucide-react"
 
 export function AuthPage() {
-  const { login } = useApp()
+  const { login } = useAppActions()
 
   return (
     <main className="flex h-[calc(100vh-64px)] w-full max-w-[1600px] bg-[#09090B] relative overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] rounded-[40px] border border-white/5">

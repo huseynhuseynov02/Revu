@@ -1,19 +1,21 @@
 "use client"
 
-import { Compass, Map, Calendar, BarChart3, Settings, Crown } from "lucide-react"
+import { Compass, Map, Calendar, BarChart3, Settings, Crown, Coins } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useApp, type ActiveView } from "@/lib/AppContext"
+import { useAppState, useAppActions, type ActiveView } from "@/lib/AppContext"
 import { motion } from "framer-motion"
 
 const menuItems: { icon: typeof Compass; label: string; view: ActiveView }[] = [
   { icon: Compass, label: "Discover", view: "discover" },
   { icon: Map, label: "Live Map", view: "livemap" },
   { icon: Crown, label: "My Bookings", view: "myplans" },
+  { icon: Coins, label: "Loyalty", view: "loyalty" },
   { icon: BarChart3, label: "Business Insights", view: "analytics" },
 ]
 
 export function Sidebar() {
-  const { activeView, setActiveView, userRole, setRole } = useApp()
+  const { activeView, userRole } = useAppState()
+  const { setActiveView, setRole } = useAppActions()
 
   // Filter menu items based on role
   const filteredMenuItems = menuItems.filter(item => {

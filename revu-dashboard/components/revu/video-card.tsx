@@ -3,9 +3,9 @@
 import { Heart, MessageCircle, Share2, Star, Zap, MapPin, Bookmark, X, Users, Clock, CheckCircle, BadgeCheck, Gift, Sparkles, CalendarDays } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { formatCount } from "@/lib/mockData"
-import { useApp } from "@/lib/AppContext"
+import { useAppActions } from "@/lib/AppContext"
 import { motion, AnimatePresence } from "framer-motion"
-import { useState, useCallback, useEffect } from "react"
+import { useState, useCallback, useEffect, memo } from "react"
 import { createPortal } from "react-dom"
 
 interface VideoCardProps {
@@ -35,7 +35,7 @@ interface VideoCardProps {
   onBookmark: () => void
 }
 
-export function VideoCard({
+function VideoCardComponent({
   id,
   image,
   title,
@@ -57,7 +57,7 @@ export function VideoCard({
   onLike,
   onBookmark,
 }: VideoCardProps) {
-  const { addBooking } = useApp()
+  const { addBooking } = useAppActions()
   const [showHeartBurst, setShowHeartBurst] = useState(false)
   const [isBookingOpen, setIsBookingOpen] = useState(false)
   const [bookingStatus, setBookingStatus] = useState<"idle" | "loading" | "success">("idle")
@@ -112,15 +112,15 @@ export function VideoCard({
     <>
       <div
         className="relative w-full max-w-[390px] mx-auto h-[min(700px,80vh)] rounded-[32px] overflow-hidden group snap-card border border-white/10 shadow-[0_30px_90px_rgba(0,0,0,0.4)]"
-        data-place-card={id}
         onDoubleClick={handleDoubleTap}
       >
         {/* Background Image */}
         <img
           src={image}
           alt={title}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          className="absolute inset-0 w-full h-full object-cover"
           loading="lazy"
+          decoding="async"
         />
 
         {/* Gradient Overlay */}
@@ -150,10 +150,7 @@ export function VideoCard({
         {/* Top Badges */}
         <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 z-20">
           <motion.div
-            className="glass px-3 py-1.5 rounded-full flex items-center gap-1.5 animate-shimmer"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+            className="glass px-3 py-1.5 rounded-full flex items-center gap-1.5"
           >
             <Zap className="w-4 h-4 text-[#3B82F6]" />
             <span className="text-xs font-semibold text-white">Vibe: {vibe}</span>
@@ -487,17 +484,16 @@ function ActionButton({
   count?: string
 }) {
   return (
-    <motion.button
-      className="flex flex-col items-center gap-1 group/btn"
-      whileTap={{ scale: 0.85 }}
-    >
-      <div className="w-12 h-12 rounded-full glass flex items-center justify-center transition-all duration-300 group-hover/btn:bg-white/10 group-hover/btn:scale-110">
+    <button type="button" className="flex flex-col items-center gap-1 group/btn active:scale-95">
+      <div className="w-12 h-12 rounded-full glass flex items-center justify-center transition-colors group-hover/btn:bg-white/10">
         <Icon className="w-6 h-6 text-white" />
       </div>
       {count && <span className="text-xs font-medium text-white">{count}</span>}
-    </motion.button>
+    </button>
   )
 }
+
+export const VideoCard = memo(VideoCardComponent)
 
 function CalendarIcon(props: React.SVGProps<SVGSVGElement>) {
   return (

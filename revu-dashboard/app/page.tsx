@@ -1,42 +1,59 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import { Sidebar } from "@/components/revu/sidebar"
-import { DiscoverFeed } from "@/components/revu/discover-feed"
-import { RightPanel } from "@/components/revu/right-panel"
-import { LiveMapView } from "@/components/revu/live-map-view"
-import { MyPlansView } from "@/components/revu/my-plans-view"
-import { AnalyticsView } from "@/components/revu/analytics-view"
-import { useApp } from "@/lib/AppContext"
-import { AnimatePresence, motion } from "framer-motion"
-
+import { useAppState } from "@/lib/AppContext"
 import { AuthPage } from "@/components/revu/auth-page"
 
+const DiscoverFeed = dynamic(
+  () => import("@/components/revu/discover-feed").then((m) => m.DiscoverFeed),
+  { loading: () => <ViewLoading /> }
+)
+const LiveMapView = dynamic(
+  () => import("@/components/revu/live-map-view").then((m) => m.LiveMapView),
+  { loading: () => <ViewLoading /> }
+)
+const MyPlansView = dynamic(
+  () => import("@/components/revu/my-plans-view").then((m) => m.MyPlansView),
+  { loading: () => <ViewLoading /> }
+)
+const LoyaltyView = dynamic(
+  () => import("@/components/revu/loyalty-view").then((m) => m.LoyaltyView),
+  { loading: () => <ViewLoading /> }
+)
+const AnalyticsView = dynamic(
+  () => import("@/components/revu/analytics-view").then((m) => m.AnalyticsView),
+  { loading: () => <ViewLoading /> }
+)
+const RightPanel = dynamic(
+  () => import("@/components/revu/right-panel").then((m) => m.RightPanel),
+  { loading: () => null }
+)
+
+function ViewLoading() {
+  return (
+    <div className="flex flex-1 items-center justify-center text-sm text-slate-500">
+      Loading…
+    </div>
+  )
+}
+
 function CenterView() {
-  const { activeView } = useApp()
+  const { activeView } = useAppState()
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={activeView}
-        className="flex-1 min-w-0 flex flex-col h-full overflow-y-auto pb-10 border-r border-white/10 bg-[#0B0B10]"
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -8 }}
-        transition={{ duration: 0.25 }}
-      >
-        <div className="w-full flex-1 flex flex-col min-h-0">
-          {activeView === "discover" && <DiscoverFeed />}
-          {activeView === "livemap" && <LiveMapView />}
-          {activeView === "myplans" && <MyPlansView />}
-          {activeView === "analytics" && <AnalyticsView />}
-        </div>
-      </motion.div>
-    </AnimatePresence>
+    <div className="flex-1 min-w-0 flex flex-col h-full overflow-y-auto pb-10 border-r border-white/10 bg-[#0B0B10] view-fade-in">
+      {activeView === "discover" && <DiscoverFeed />}
+      {activeView === "livemap" && <LiveMapView />}
+      {activeView === "myplans" && <MyPlansView />}
+      {activeView === "loyalty" && <LoyaltyView />}
+      {activeView === "analytics" && <AnalyticsView />}
+    </div>
   )
 }
 
 function DashboardLayout() {
-  const { userRole } = useApp()
+  const { userRole } = useAppState()
 
   return (
     <div className="min-h-screen h-screen bg-black overflow-hidden">
@@ -50,31 +67,15 @@ function DashboardLayout() {
 }
 
 export default function Home() {
-  const { isAuthenticated } = useApp()
+  const { isAuthenticated } = useAppState()
 
-  return (
-    <AnimatePresence mode="wait">
-      {!isAuthenticated ? (
-        <motion.div
-          key="auth"
-          className="min-h-screen h-screen bg-black flex items-center justify-center overflow-hidden"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0, scale: 1.05 }}
-          transition={{ duration: 0.5 }}
-        >
-          <AuthPage />
-        </motion.div>
-      ) : (
-        <motion.div
-          key="app"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6 }}
-        >
-          <DashboardLayout />
-        </motion.div>
-      )}
-    </AnimatePresence>
-  )
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen h-screen bg-black flex items-center justify-center overflow-hidden">
+        <AuthPage />
+      </div>
+    )
+  }
+
+  return <DashboardLayout />
 }

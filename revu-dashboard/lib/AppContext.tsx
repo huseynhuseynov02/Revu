@@ -1,9 +1,16 @@
 "use client"
 
-import React, { createContext, useContext, useState, useCallback, useRef } from "react"
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useRef,
+  useMemo,
+} from "react"
 import { mockPlaces, type Place } from "./mockData"
 
-export type ActiveView = "discover" | "livemap" | "myplans" | "analytics"
+export type ActiveView = "discover" | "livemap" | "myplans" | "loyalty" | "analytics"
 
 export type UserRole = "user" | "business"
 
@@ -17,13 +24,17 @@ export interface Booking {
   status: "confirmed" | "pending" | "cancelled"
 }
 
-interface AppContextType {
+export interface AppState {
   places: Place[]
   bookings: Booking[]
   activeView: ActiveView
   activePlaceIndex: number
   isAuthenticated: boolean
   userRole: UserRole | null
+  feedScrollRef: React.RefObject<HTMLDivElement | null>
+}
+
+export interface AppActions {
   setActiveView: (view: ActiveView) => void
   setActivePlaceIndex: (index: number) => void
   setRole: (role: UserRole) => void
@@ -33,10 +44,10 @@ interface AppContextType {
   addBooking: (booking: Omit<Booking, "id" | "status">) => void
   login: (role: UserRole) => void
   logout: () => void
-  feedScrollRef: React.RefObject<HTMLDivElement | null>
 }
 
-const AppContext = createContext<AppContextType | undefined>(undefined)
+const AppStateContext = createContext<AppState | null>(null)
+const AppActionsContext = createContext<AppActions | null>(null)
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [places, setPlaces] = useState<Place[]>(() =>
@@ -48,11 +59,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [userRole, setUserRole] = useState<UserRole | null>(null)
   const feedScrollRef = useRef<HTMLDivElement | null>(null)
+  const placesRef = useRef(places)
+  placesRef.current = places
 
   const login = useCallback((role: UserRole) => {
     setIsAuthenticated(true)
     setUserRole(role)
   }, [])
+
   const logout = useCallback(() => {
     setIsAuthenticated(false)
     setUserRole(null)
@@ -84,74 +98,94 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const newBooking: Booking = {
       ...bookingData,
       id: Math.random().toString(36).substr(2, 9),
-      status: "confirmed"
+      status: "confirmed",
     }
-    setBookings(prev => [newBooking, ...prev])
-    
-    // Mark the place as visited when booked
-    setPlaces(prev => prev.map(p => 
-      p.id === bookingData.placeId ? { ...p, visited: true } : p
-    ))
+    setBookings((prev) => [newBooking, ...prev])
+    setPlaces((prev) =>
+      prev.map((p) =>
+        p.id === bookingData.placeId ? { ...p, visited: true } : p
+      )
+    )
   }, [])
 
-  const goToPlace = useCallback(
-    (id: string) => {
-      const index = places.findIndex((p) => p.id === id)
-      if (index !== -1) {
-        setActivePlaceIndex(index)
-        setActiveView("discover")
-        // Scroll to the card in the feed
-        setTimeout(() => {
-          const container = feedScrollRef.current
-          if (container) {
-            const cards = container.querySelectorAll("[data-place-card]")
-            if (cards[index]) {
-              cards[index].scrollIntoView({ behavior: "smooth", block: "center" })
-            }
-          }
-        }, 100)
-      }
-    },
-    [places]
-  )
+  const goToPlace = useCallback((id: string) => {
+    const index = placesRef.current.findIndex((p) => p.id === id)
+    if (index === -1) return
+
+    setActivePlaceIndex(index)
+    setActiveView("discover")
+
+    requestAnimationFrame(() => {
+      const container = feedScrollRef.current
+      if (!container) return
+      const card = container.querySelectorAll("[data-place-card]")[index]
+      card?.scrollIntoView({ behavior: "smooth", block: "center" })
+    })
+  }, [])
 
   const setRole = useCallback((role: UserRole) => {
     setUserRole(role)
-    if (role === "business") {
-      setActiveView("analytics")
-    } else {
-      setActiveView("discover")
-    }
+    setActiveView(role === "business" ? "analytics" : "discover")
   }, [])
 
+  const state = useMemo<AppState>(
+    () => ({
+      places,
+      bookings,
+      activeView,
+      activePlaceIndex,
+      isAuthenticated,
+      userRole,
+      feedScrollRef,
+    }),
+    [places, bookings, activeView, activePlaceIndex, isAuthenticated, userRole]
+  )
+
+  const actions = useMemo<AppActions>(
+    () => ({
+      setActiveView,
+      setActivePlaceIndex,
+      setRole,
+      toggleLike,
+      toggleBookmark,
+      goToPlace,
+      addBooking,
+      login,
+      logout,
+    }),
+    [
+      toggleLike,
+      toggleBookmark,
+      goToPlace,
+      addBooking,
+      login,
+      logout,
+      setRole,
+    ]
+  )
+
   return (
-    <AppContext.Provider
-      value={{
-        places,
-        bookings,
-        activeView,
-        activePlaceIndex,
-        isAuthenticated,
-        userRole,
-        setActiveView,
-        setActivePlaceIndex,
-        setRole,
-        toggleLike,
-        toggleBookmark,
-        goToPlace,
-        addBooking,
-        login,
-        logout,
-        feedScrollRef,
-      }}
-    >
-      {children}
-    </AppContext.Provider>
+    <AppStateContext.Provider value={state}>
+      <AppActionsContext.Provider value={actions}>
+        {children}
+      </AppActionsContext.Provider>
+    </AppStateContext.Provider>
   )
 }
 
-export function useApp() {
-  const ctx = useContext(AppContext)
-  if (!ctx) throw new Error("useApp must be used within AppProvider")
+export function useAppState(): AppState {
+  const ctx = useContext(AppStateContext)
+  if (!ctx) throw new Error("useAppState must be used within AppProvider")
   return ctx
+}
+
+export function useAppActions(): AppActions {
+  const ctx = useContext(AppActionsContext)
+  if (!ctx) throw new Error("useAppActions must be used within AppProvider")
+  return ctx
+}
+
+/** Full store — prefer useAppState / useAppActions when you only need one side. */
+export function useApp(): AppState & AppActions {
+  return { ...useAppState(), ...useAppActions() }
 }
