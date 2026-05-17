@@ -161,18 +161,15 @@ export function Sidebar() {
             transition={{ type: "spring", stiffness: 300 }}
           >
             <div className="relative">
-              {/* Using a reliable UI faces URL, removed the old one just in case it caused the 'N' issue */}
-              <img
-                src="https://i.pravatar.cc/150?u=sarah"
-                alt="Sarah"
-                className="w-10 h-10 rounded-full object-cover ring-2 ring-white/10"
-              />
+              <div className="w-10 h-10 rounded-full bg-[#111214] flex items-center justify-center ring-2 ring-white/10 overflow-hidden">
+                <span className="text-sm font-bold text-white">HH</span>
+              </div>
               <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-[#09090B] rounded-full flex items-center justify-center">
                 <div className="w-3 h-3 bg-[#0057FF] rounded-full shadow-[0_0_8px_rgba(0,87,255,0.6)]" />
               </div>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-sm text-white truncate">Sarah C.</p>
+              <p className="font-semibold text-sm text-white truncate">Huseyn Huseynov</p>
               <p className="text-xs text-zinc-500 truncate">Foodie & Explorer</p>
             </div>
           </motion.div>
